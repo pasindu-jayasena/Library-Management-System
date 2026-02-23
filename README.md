@@ -261,4 +261,3 @@ The application uses **SQLite** — a lightweight, file-based database.
 
 ---
 
-*Developed for DIT2145 — Software Development Project, Institute of Management & Business Studies*
