@@ -30,8 +30,8 @@ namespace SarasaviLibrary.Forms
             this.Size = new Size(600, 500);
             this.StartPosition = FormStartPosition.CenterParent;
             this.BackColor = Color.FromArgb(240, 244, 248);
-            this.FormBorderStyle = FormBorderStyle.FixedDialog;
-            this.MaximizeBox = false;
+            this.FormBorderStyle = FormBorderStyle.Sizable;
+            this.MaximizeBox = true;
 
             // ─── Header ───
             Panel header = new Panel
@@ -58,15 +58,28 @@ namespace SarasaviLibrary.Forms
             });
             this.Controls.Add(header);
 
+            // ─── Content Layout ───
+            TableLayoutPanel tbl = new TableLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                ColumnCount = 1, RowCount = 2,
+                Padding = new Padding(10),
+                BackColor = Color.Transparent
+            };
+            tbl.RowStyles.Add(new RowStyle(SizeType.Absolute, 145f));
+            tbl.RowStyles.Add(new RowStyle(SizeType.Percent, 100f));
+            this.Controls.Add(tbl);
+            tbl.BringToFront();
+
             // ─── Return Section ───
             GroupBox grpReturn = new GroupBox
             {
                 Text = "Return a Book",
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                Location = new Point(20, 80),
-                Size = new Size(545, 130)
+                Dock = DockStyle.Fill,
+                Margin = new Padding(0, 0, 0, 5)
             };
-            this.Controls.Add(grpReturn);
+            tbl.Controls.Add(grpReturn, 0, 0);
 
             grpReturn.Controls.Add(new Label
             {
@@ -113,15 +126,14 @@ namespace SarasaviLibrary.Forms
             {
                 Text = "Return Details",
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                Location = new Point(20, 220),
-                Size = new Size(545, 220)
+                Dock = DockStyle.Fill,
+                Margin = new Padding(0, 5, 0, 0)
             };
-            this.Controls.Add(grpResult);
+            tbl.Controls.Add(grpResult, 0, 1);
 
             rtbResult = new RichTextBox
             {
-                Location = new Point(10, 25),
-                Size = new Size(525, 185),
+                Dock = DockStyle.Fill,
                 ReadOnly = true,
                 Font = new Font("Segoe UI", 10),
                 BackColor = Color.White,

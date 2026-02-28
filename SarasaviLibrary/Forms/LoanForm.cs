@@ -39,8 +39,8 @@ namespace SarasaviLibrary.Forms
             this.Size = new Size(850, 600);
             this.StartPosition = FormStartPosition.CenterParent;
             this.BackColor = Color.FromArgb(240, 244, 248);
-            this.FormBorderStyle = FormBorderStyle.FixedDialog;
-            this.MaximizeBox = false;
+            this.FormBorderStyle = FormBorderStyle.Sizable;
+            this.MaximizeBox = true;
 
             // ─── Header ───
             Panel header = new Panel
@@ -67,15 +67,40 @@ namespace SarasaviLibrary.Forms
             });
             this.Controls.Add(header);
 
+            // ─── Content Layout ───
+            TableLayoutPanel tbl = new TableLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                ColumnCount = 2, RowCount = 1,
+                Padding = new Padding(10),
+                BackColor = Color.Transparent
+            };
+            tbl.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50f));
+            tbl.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50f));
+            tbl.RowStyles.Add(new RowStyle(SizeType.Percent, 100f));
+            this.Controls.Add(tbl);
+            tbl.BringToFront();
+
+            TableLayoutPanel tblLeft = new TableLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                ColumnCount = 1, RowCount = 2,
+                Margin = new Padding(0),
+                BackColor = Color.Transparent
+            };
+            tblLeft.RowStyles.Add(new RowStyle(SizeType.Percent, 45f));
+            tblLeft.RowStyles.Add(new RowStyle(SizeType.Percent, 55f));
+            tbl.Controls.Add(tblLeft, 0, 0);
+
             // ─── Member Section ───
             GroupBox grpMember = new GroupBox
             {
                 Text = "Step 1: Select Member",
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                Location = new Point(20, 80),
-                Size = new Size(400, 150)
+                Dock = DockStyle.Fill,
+                Margin = new Padding(0, 0, 5, 5)
             };
-            this.Controls.Add(grpMember);
+            tblLeft.Controls.Add(grpMember, 0, 0);
 
             grpMember.Controls.Add(MakeLabel("User No:", 10, 30));
             txtUserNumber = new TextBox
@@ -124,10 +149,10 @@ namespace SarasaviLibrary.Forms
             {
                 Text = "Step 2: Select Copy to Loan",
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                Location = new Point(20, 240),
-                Size = new Size(400, 160)
+                Dock = DockStyle.Fill,
+                Margin = new Padding(0, 5, 5, 0)
             };
-            this.Controls.Add(grpCopy);
+            tblLeft.Controls.Add(grpCopy, 0, 1);
 
             grpCopy.Controls.Add(MakeLabel("Copy No:", 10, 30));
             txtCopyNumber = new TextBox
@@ -183,15 +208,14 @@ namespace SarasaviLibrary.Forms
             {
                 Text = "Active Loans",
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                Location = new Point(440, 80),
-                Size = new Size(380, 320)
+                Dock = DockStyle.Fill,
+                Margin = new Padding(5, 0, 0, 0)
             };
-            this.Controls.Add(grpLoans);
+            tbl.Controls.Add(grpLoans, 1, 0);
 
             dgvActiveLoans = new DataGridView
             {
-                Location = new Point(10, 25),
-                Size = new Size(360, 285),
+                Dock = DockStyle.Fill,
                 AllowUserToAddRows = false,
                 AllowUserToDeleteRows = false,
                 ReadOnly = true,

@@ -34,8 +34,8 @@ namespace SarasaviLibrary.Forms
             this.Size = new Size(900, 650);
             this.StartPosition = FormStartPosition.CenterParent;
             this.BackColor = Color.FromArgb(240, 244, 248);
-            this.FormBorderStyle = FormBorderStyle.FixedDialog;
-            this.MaximizeBox = false;
+            this.FormBorderStyle = FormBorderStyle.Sizable;
+            this.MaximizeBox = true;
 
             // ─── Header ───
             Panel header = new Panel
@@ -62,15 +62,29 @@ namespace SarasaviLibrary.Forms
             });
             this.Controls.Add(header);
 
+            // ─── Content Layout ───
+            TableLayoutPanel tbl = new TableLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                ColumnCount = 1, RowCount = 3,
+                Padding = new Padding(10),
+                BackColor = Color.Transparent
+            };
+            tbl.RowStyles.Add(new RowStyle(SizeType.Absolute, 90f));
+            tbl.RowStyles.Add(new RowStyle(SizeType.Percent, 55f));
+            tbl.RowStyles.Add(new RowStyle(SizeType.Percent, 45f));
+            this.Controls.Add(tbl);
+            tbl.BringToFront();
+
             // ─── Search Section ───
             GroupBox grpSearch = new GroupBox
             {
                 Text = "Search Books",
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                Location = new Point(20, 80),
-                Size = new Size(845, 70)
+                Dock = DockStyle.Fill,
+                Margin = new Padding(0, 0, 0, 5)
             };
-            this.Controls.Add(grpSearch);
+            tbl.Controls.Add(grpSearch, 0, 0);
 
             grpSearch.Controls.Add(new Label
             {
@@ -134,15 +148,14 @@ namespace SarasaviLibrary.Forms
             {
                 Text = "Search Results",
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                Location = new Point(20, 160),
-                Size = new Size(845, 220)
+                Dock = DockStyle.Fill,
+                Margin = new Padding(0, 5, 0, 5)
             };
-            this.Controls.Add(grpResults);
+            tbl.Controls.Add(grpResults, 0, 1);
 
             dgvResults = new DataGridView
             {
-                Location = new Point(10, 25),
-                Size = new Size(825, 185),
+                Dock = DockStyle.Fill,
                 AllowUserToAddRows = false,
                 AllowUserToDeleteRows = false,
                 ReadOnly = true,
@@ -172,15 +185,16 @@ namespace SarasaviLibrary.Forms
             {
                 Text = "Copy Details",
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                Location = new Point(20, 390),
-                Size = new Size(845, 210)
+                Dock = DockStyle.Fill,
+                Margin = new Padding(0, 5, 0, 0)
             };
-            this.Controls.Add(grpDetails);
+            tbl.Controls.Add(grpDetails, 0, 2);
 
             lblSummary = new Label
             {
                 Location = new Point(10, 25),
                 Size = new Size(825, 25),
+                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right,
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
                 ForeColor = Color.FromArgb(26, 54, 93)
             };
@@ -189,7 +203,7 @@ namespace SarasaviLibrary.Forms
             dgvCopies = new DataGridView
             {
                 Location = new Point(10, 55),
-                Size = new Size(825, 145),
+                Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,
                 AllowUserToAddRows = false,
                 AllowUserToDeleteRows = false,
                 ReadOnly = true,

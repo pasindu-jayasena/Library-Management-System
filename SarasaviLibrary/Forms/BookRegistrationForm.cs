@@ -41,22 +41,36 @@ namespace SarasaviLibrary.Forms
             this.Size = new Size(950, 700);
             this.StartPosition = FormStartPosition.CenterParent;
             this.BackColor = Color.FromArgb(240, 244, 248);
-            this.FormBorderStyle = FormBorderStyle.FixedDialog;
-            this.MaximizeBox = false;
+            this.FormBorderStyle = FormBorderStyle.Sizable;
+            this.MaximizeBox = true;
 
             // ─── Header ───
             Panel header = CreateHeader("Book Registration", "Register new books and copies to the catalogue");
             this.Controls.Add(header);
+
+            // ─── Content Layout ───
+            TableLayoutPanel tbl = new TableLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                ColumnCount = 2, RowCount = 1,
+                Padding = new Padding(10),
+                BackColor = Color.Transparent
+            };
+            tbl.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 47f));
+            tbl.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 53f));
+            tbl.RowStyles.Add(new RowStyle(SizeType.Percent, 100f));
+            this.Controls.Add(tbl);
+            tbl.BringToFront();
 
             // ─── Input Section ───
             GroupBox grpInput = new GroupBox
             {
                 Text = "Book Details",
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                Location = new Point(20, 80),
-                Size = new Size(440, 350)
+                Dock = DockStyle.Fill,
+                Margin = new Padding(0, 0, 5, 0)
             };
-            this.Controls.Add(grpInput);
+            tbl.Controls.Add(grpInput, 0, 0);
 
             int y = 30;
             int inputX = 120;
@@ -171,15 +185,27 @@ namespace SarasaviLibrary.Forms
             btnClear.Click += (s, e) => ClearForm();
             grpInput.Controls.Add(btnClear);
 
+            // Right column: stacked Books + Copies
+            TableLayoutPanel tblRight = new TableLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                ColumnCount = 1, RowCount = 2,
+                Margin = new Padding(0),
+                BackColor = Color.Transparent
+            };
+            tblRight.RowStyles.Add(new RowStyle(SizeType.Percent, 58f));
+            tblRight.RowStyles.Add(new RowStyle(SizeType.Percent, 42f));
+            tbl.Controls.Add(tblRight, 1, 0);
+
             // ─── Books Grid ───
             GroupBox grpBooks = new GroupBox
             {
                 Text = "Registered Books",
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                Location = new Point(480, 80),
-                Size = new Size(445, 200)
+                Dock = DockStyle.Fill,
+                Margin = new Padding(5, 0, 0, 5)
             };
-            this.Controls.Add(grpBooks);
+            tblRight.Controls.Add(grpBooks, 0, 0);
 
             dgvBooks = CreateDataGridView(10, 25, 425, 165);
             dgvBooks.Columns.Add("BookNumber", "Book No.");
@@ -196,10 +222,10 @@ namespace SarasaviLibrary.Forms
             {
                 Text = "Copies of Selected Book",
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                Location = new Point(480, 290),
-                Size = new Size(445, 140)
+                Dock = DockStyle.Fill,
+                Margin = new Padding(5, 5, 0, 0)
             };
-            this.Controls.Add(grpCopies);
+            tblRight.Controls.Add(grpCopies, 0, 1);
 
             dgvCopies = CreateDataGridView(10, 25, 425, 105);
             dgvCopies.Columns.Add("CopyNumber", "Copy No.");
@@ -383,8 +409,7 @@ namespace SarasaviLibrary.Forms
         {
             return new DataGridView
             {
-                Location = new Point(x, y),
-                Size = new Size(width, height),
+                Dock = DockStyle.Fill,
                 AllowUserToAddRows = false,
                 AllowUserToDeleteRows = false,
                 ReadOnly = true,

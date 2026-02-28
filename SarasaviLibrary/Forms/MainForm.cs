@@ -9,6 +9,12 @@ namespace SarasaviLibrary.Forms
     /// </summary>
     public class MainForm : Form
     {
+        private Panel _buttonPanel = null!;
+
+        // Stores each card's scalable controls for dynamic resizing
+        private record CardEntry(Panel Card, Label Title, Label Desc, Panel Accent);
+        private readonly List<CardEntry> _cards = new();
+
         public MainForm()
         {
             InitializeComponent();
@@ -21,8 +27,9 @@ namespace SarasaviLibrary.Forms
             this.Size = new Size(900, 620);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.BackColor = Color.FromArgb(240, 244, 248);
-            this.FormBorderStyle = FormBorderStyle.FixedSingle;
-            this.MaximizeBox = false;
+            this.FormBorderStyle = FormBorderStyle.Sizable;
+            this.MaximizeBox = true;
+            this.MinimumSize = new Size(700, 500);
 
             // ─── Header Panel ───
             Panel headerPanel = new Panel
@@ -57,13 +64,12 @@ namespace SarasaviLibrary.Forms
             };
             headerPanel.Controls.Add(subtitleLabel);
 
-            // ─── Button Panel ───
-            Panel buttonPanel = new Panel
+            // ─── Card Grid Panel ───
+            _buttonPanel = new Panel
             {
-                Location = new Point(30, 130),
-                Size = new Size(830, 430)
+                BackColor = Color.Transparent
             };
-            this.Controls.Add(buttonPanel);
+            this.Controls.Add(_buttonPanel);
 
             // Create 6 process buttons in a 3×2 grid
             string[,] buttons = {
@@ -75,26 +81,24 @@ namespace SarasaviLibrary.Forms
                 { "🔍  Inquiry",              "Search book availability" }
             };
 
-            int buttonWidth = 250;
-            int buttonHeight = 180;
-            int gapX = 20;
-            int gapY = 20;
+            Color[] accentColors = {
+                Color.FromArgb(52, 152, 219),
+                Color.FromArgb(46, 204, 113),
+                Color.FromArgb(230, 126, 34),
+                Color.FromArgb(155, 89, 182),
+                Color.FromArgb(231, 76, 60),
+                Color.FromArgb(241, 196, 15)
+            };
 
             for (int i = 0; i < 6; i++)
             {
-                int col = i % 3;
-                int row = i / 3;
-
                 Panel card = new Panel
                 {
-                    Location = new Point(col * (buttonWidth + gapX), row * (buttonHeight + gapY)),
-                    Size = new Size(buttonWidth, buttonHeight),
                     BackColor = Color.White,
                     Cursor = Cursors.Hand,
                     Tag = i
                 };
 
-                // Rounded appearance via painting
                 card.Paint += (s, e) =>
                 {
                     e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
@@ -108,8 +112,6 @@ namespace SarasaviLibrary.Forms
                     Font = new Font("Segoe UI", 14, FontStyle.Bold),
                     ForeColor = Color.FromArgb(26, 54, 93),
                     AutoSize = false,
-                    Size = new Size(230, 50),
-                    Location = new Point(10, 40),
                     TextAlign = ContentAlignment.MiddleCenter
                 };
                 card.Controls.Add(cardTitle);
@@ -120,48 +122,97 @@ namespace SarasaviLibrary.Forms
                     Font = new Font("Segoe UI", 10),
                     ForeColor = Color.FromArgb(100, 120, 140),
                     AutoSize = false,
-                    Size = new Size(230, 30),
-                    Location = new Point(10, 100),
                     TextAlign = ContentAlignment.MiddleCenter
                 };
                 card.Controls.Add(cardDesc);
 
-                // Color accent bar at top of card
-                Color[] accentColors = {
-                    Color.FromArgb(52, 152, 219),   // Blue
-                    Color.FromArgb(46, 204, 113),   // Green
-                    Color.FromArgb(230, 126, 34),   // Orange
-                    Color.FromArgb(155, 89, 182),   // Purple
-                    Color.FromArgb(231, 76, 60),    // Red
-                    Color.FromArgb(241, 196, 15)    // Yellow
-                };
-
                 Panel accentBar = new Panel
                 {
                     Location = new Point(0, 0),
-                    Size = new Size(buttonWidth, 5),
                     BackColor = accentColors[i]
                 };
                 card.Controls.Add(accentBar);
 
                 int index = i;
-                // Handle click on entire card
-                card.Click += (s, e) => OpenForm(index);
+                card.Click      += (s, e) => OpenForm(index);
                 cardTitle.Click += (s, e) => OpenForm(index);
-                cardDesc.Click += (s, e) => OpenForm(index);
+                cardDesc.Click  += (s, e) => OpenForm(index);
 
-                // Hover effects
                 EventHandler mouseEnter = (s, e) => card.BackColor = Color.FromArgb(245, 248, 252);
                 EventHandler mouseLeave = (s, e) => card.BackColor = Color.White;
 
-                card.MouseEnter += mouseEnter;
-                card.MouseLeave += mouseLeave;
+                card.MouseEnter      += mouseEnter;
+                card.MouseLeave      += mouseLeave;
                 cardTitle.MouseEnter += mouseEnter;
                 cardTitle.MouseLeave += mouseLeave;
-                cardDesc.MouseEnter += mouseEnter;
-                cardDesc.MouseLeave += mouseLeave;
+                cardDesc.MouseEnter  += mouseEnter;
+                cardDesc.MouseLeave  += mouseLeave;
 
-                buttonPanel.Controls.Add(card);
+                _cards.Add(new CardEntry(card, cardTitle, cardDesc, accentBar));
+                _buttonPanel.Controls.Add(card);
+            }
+
+            // Initial layout + recalculate on every resize
+            this.Load   += (s, e) => AdjustLayout();
+            this.Resize += (s, e) => AdjustLayout();
+        }
+
+        // ─── Layout helper: scales and centres the card grid ───
+        private void AdjustLayout()
+        {
+            const int headerHeight = 100;
+            const int padding      = 40;   // margin around the grid
+
+            int availW = this.ClientSize.Width  - padding * 2;
+            int availH = this.ClientSize.Height - headerHeight - padding * 2;
+            if (availW < 1 || availH < 1) return;
+
+            // Scale relative to the base window size (900 × 620)
+            float scaleX = availW / 790f;   // base grid width
+            float scaleY = availH / 380f;   // base grid height
+            float s      = Math.Min(scaleX, scaleY);
+            s = Math.Max(0.5f, Math.Min(s, 3.0f)); // clamp
+
+            int cardW  = (int)(250 * s);
+            int cardH  = (int)(180 * s);
+            int gapX   = (int)(20  * s);
+            int gapY   = (int)(20  * s);
+
+            int gridW = 3 * cardW + 2 * gapX;
+            int gridH = 2 * cardH + gapY;
+
+            int panelX = padding + Math.Max(0, (availW - gridW) / 2);
+            int panelY = headerHeight + padding + Math.Max(0, (availH - gridH) / 2);
+
+            _buttonPanel.Location = new Point(panelX, panelY);
+            _buttonPanel.Size     = new Size(gridW, gridH);
+
+            // Resize each card and its internal controls
+            for (int i = 0; i < _cards.Count; i++)
+            {
+                int col = i % 3;
+                int row = i / 3;
+
+                var (card, title, desc, accent) = _cards[i];
+
+                card.Location = new Point(col * (cardW + gapX), row * (cardH + gapY));
+                card.Size     = new Size(cardW, cardH);
+
+                int innerW    = cardW - (int)(20 * s);
+                int titleH    = (int)(50 * s);
+                int descH     = (int)(30 * s);
+                int titleTop  = (int)(40 * s);
+                int descTop   = (int)(cardH * 0.58f);
+
+                title.Location = new Point((int)(10 * s), titleTop);
+                title.Size     = new Size(innerW, titleH);
+                title.Font     = new Font("Segoe UI", Math.Max(8f, 14f * s), FontStyle.Bold);
+
+                desc.Location  = new Point((int)(10 * s), descTop);
+                desc.Size      = new Size(innerW, descH);
+                desc.Font      = new Font("Segoe UI", Math.Max(6f, 10f * s));
+
+                accent.Size    = new Size(cardW, Math.Max(4, (int)(5 * s)));
             }
         }
 

@@ -37,8 +37,8 @@ namespace SarasaviLibrary.Forms
             this.Size = new Size(850, 600);
             this.StartPosition = FormStartPosition.CenterParent;
             this.BackColor = Color.FromArgb(240, 244, 248);
-            this.FormBorderStyle = FormBorderStyle.FixedDialog;
-            this.MaximizeBox = false;
+            this.FormBorderStyle = FormBorderStyle.Sizable;
+            this.MaximizeBox = true;
 
             // ─── Header ───
             Panel header = new Panel
@@ -65,15 +65,29 @@ namespace SarasaviLibrary.Forms
             });
             this.Controls.Add(header);
 
+            // ─── Content Layout ───
+            TableLayoutPanel tbl = new TableLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                ColumnCount = 2, RowCount = 1,
+                Padding = new Padding(10),
+                BackColor = Color.Transparent
+            };
+            tbl.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50f));
+            tbl.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50f));
+            tbl.RowStyles.Add(new RowStyle(SizeType.Percent, 100f));
+            this.Controls.Add(tbl);
+            tbl.BringToFront();
+
             // ─── Input Group ───
             GroupBox grpInput = new GroupBox
             {
                 Text = "User Details",
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                Location = new Point(20, 80),
-                Size = new Size(400, 350)
+                Dock = DockStyle.Fill,
+                Margin = new Padding(0, 0, 5, 0)
             };
-            this.Controls.Add(grpInput);
+            tbl.Controls.Add(grpInput, 0, 0);
 
             int y = 30;
             int inputX = 120;
@@ -197,15 +211,14 @@ namespace SarasaviLibrary.Forms
             {
                 Text = "Registered Users",
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                Location = new Point(440, 80),
-                Size = new Size(380, 350)
+                Dock = DockStyle.Fill,
+                Margin = new Padding(5, 0, 0, 0)
             };
-            this.Controls.Add(grpUsers);
+            tbl.Controls.Add(grpUsers, 1, 0);
 
             dgvUsers = new DataGridView
             {
-                Location = new Point(10, 25),
-                Size = new Size(360, 315),
+                Dock = DockStyle.Fill,
                 AllowUserToAddRows = false,
                 AllowUserToDeleteRows = false,
                 ReadOnly = true,
