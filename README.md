@@ -72,7 +72,7 @@ You need **one** of the following installed on your computer:
 Open a terminal (Command Prompt or PowerShell) and run:
 
 ```
-cd c:\Users\CHAMODYA\Desktop\LMSProject
+cd c:\Users\PASINDU\Desktop\LMSProject
 dotnet run --project SarasaviLibrary
 ```
 
@@ -261,4 +261,3 @@ The application uses **SQLite** — a lightweight, file-based database.
 
 ---
 
-*Developed for DIT2145 — Software Development Project, Institute of Management & Business Studies*
